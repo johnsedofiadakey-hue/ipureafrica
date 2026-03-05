@@ -844,7 +844,8 @@
       style="width:300px;height:300px;bottom:-100px;left:-50px;background:radial-gradient(circle,var(--deep),transparent);">
     </div>
     <div class="lcard">
-      <img src="logo.png" alt="iPure" style="height:60px;width:auto;object-fit:contain;display:block;margin:0 auto 6px;"
+      <img src="logo.png" alt="iPure"
+        style="height:110px;width:auto;object-fit:contain;display:block;margin:0 auto 6px;"
         onerror="this.style.display='none';this.nextSibling.style.display='block';" /><span class="llogo"
         style="display:none;">iPure</span>
       <div class="lsub">Admin Control Panel</div>
@@ -860,7 +861,7 @@
 
   <div id="admin-screen">
     <aside class="sidebar">
-      <img src="logo.png" alt="iPure" style="height:40px;width:auto;object-fit:contain;display:block;margin:0 26px 3px;"
+      <img src="logo.png" alt="iPure" style="height:70px;width:auto;object-fit:contain;display:block;margin:0 26px 3px;"
         onerror="this.style.display='none';this.nextSibling.style.display='block';" /><span class="sblogo"
         style="display:none;">iPure</span>
       <span class="sbtag">Admin Panel</span>
@@ -1377,37 +1378,37 @@
     function prevImg(input) { if (input.files && input.files[0]) { const r = new FileReader(); r.onload = e => { document.getElementById('pimg').src = e.target.result; document.getElementById('iprev').style.display = 'block'; }; r.readAsDataURL(input.files[0]); } }
     function showT(msg, type = 's') { const t = document.getElementById('toast'); t.textContent = msg; t.style.background = type === 'e' ? 'rgba(239,83,80,.92)' : 'rgba(38,166,154,.92)'; t.classList.add('show'); setTimeout(() => t.classList.remove('show'), 3200); }
     document.getElementById('pm').addEventListener('click', e => { if (e.target === document.getElementById('pm')) closePM(); });
-// --- LOGO UPLOAD ---
-function handleLogoUpload(input) {
-  if (input.files && input.files[0]) {
-    const reader = new FileReader();
-    reader.onload = function(e) {
-      const dataUrl = e.target.result;
-      localStorage.setItem('ipure_logo', dataUrl);
-      applyLogoToAdmin();
-      showT('Logo updated! Live on site ✓');
+    // --- LOGO UPLOAD ---
+    function handleLogoUpload(input) {
+      if (input.files && input.files[0]) {
+        const reader = new FileReader();
+        reader.onload = function (e) {
+          const dataUrl = e.target.result;
+          localStorage.setItem('ipure_logo', dataUrl);
+          applyLogoToAdmin();
+          showT('Logo updated! Live on site ✓');
+        }
+        reader.readAsDataURL(input.files[0]);
+      }
     }
-    reader.readAsDataURL(input.files[0]);
-  }
-}
-function resetLogo() {
-  localStorage.removeItem('ipure_logo');
-  applyLogoToAdmin();
-  showT('Logo reset to default ✓');
-}
-function applyLogoToAdmin() {
-  const customLogo = localStorage.getItem('ipure_logo');
-  const src = customLogo || 'logo.png';
-  document.querySelectorAll('img[alt="iPure"]').forEach(img => {
-      img.src = src;
-  });
-  const btn = document.getElementById('reset-logo-btn');
-  if (btn) btn.style.display = customLogo ? 'block' : 'none';
-}
-applyLogoToAdmin();
-window.addEventListener('storage', (e) => {
-    if (e.key === 'ipure_logo') applyLogoToAdmin();
-});
+    function resetLogo() {
+      localStorage.removeItem('ipure_logo');
+      applyLogoToAdmin();
+      showT('Logo reset to default ✓');
+    }
+    function applyLogoToAdmin() {
+      const customLogo = localStorage.getItem('ipure_logo');
+      const src = customLogo || 'logo.png';
+      document.querySelectorAll('img[alt="iPure"]').forEach(img => {
+        img.src = src;
+      });
+      const btn = document.getElementById('reset-logo-btn');
+      if (btn) btn.style.display = customLogo ? 'block' : 'none';
+    }
+    applyLogoToAdmin();
+    window.addEventListener('storage', (e) => {
+      if (e.key === 'ipure_logo') applyLogoToAdmin();
+    });
 
   </script>
 </body>
