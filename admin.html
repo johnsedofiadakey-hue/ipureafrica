@@ -1,0 +1,1370 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>iPure Admin — Control Panel</title>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,600;1,300&family=DM+Sans:wght@300;400;500;600&display=swap"
+    rel="stylesheet">
+  <style>
+    :root {
+      --teal: #0A9396;
+      --deep: #005F73;
+      --night: #03242B;
+      --mint: #94D2BD;
+      --gold: #E9C46A;
+      --white: #FAFCFD;
+      --glass: rgba(255, 255, 255, .06);
+      --gb: rgba(255, 255, 255, .11);
+      --danger: #ef5350;
+      --success: #26a69a;
+      --warn: #ffa726;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    html,
+    body {
+      height: 100%;
+      font-family: 'DM Sans', sans-serif;
+      background: var(--night);
+      color: var(--white);
+    }
+
+    #login-screen {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: radial-gradient(ellipse 80% 70% at 50% 50%, rgba(10, 147, 150, .18) 0%, transparent 70%), var(--night);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .lorb {
+      position: absolute;
+      border-radius: 50%;
+      background: radial-gradient(circle, var(--teal), transparent);
+      filter: blur(80px);
+      opacity: .2;
+      pointer-events: none;
+    }
+
+    .lcard {
+      position: relative;
+      z-index: 2;
+      width: 420px;
+      max-width: 92vw;
+      background: var(--glass);
+      border: 1px solid var(--gb);
+      border-radius: 28px;
+      padding: 52px 44px;
+      backdrop-filter: blur(30px);
+      box-shadow: 0 40px 80px rgba(0, 0, 0, .4);
+      animation: cIn .6s ease both;
+    }
+
+    @keyframes cIn {
+      from {
+        opacity: 0;
+        transform: translateY(40px) scale(.96)
+      }
+
+      to {
+        opacity: 1;
+        transform: none
+      }
+    }
+
+    .llogo {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 2.4rem;
+      font-weight: 600;
+      letter-spacing: 3px;
+      text-align: center;
+      display: block;
+      margin-bottom: 6px;
+      background: linear-gradient(135deg, var(--mint), var(--teal));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .lsub {
+      text-align: center;
+      font-size: .72rem;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: rgba(255, 255, 255, .3);
+      margin-bottom: 44px;
+    }
+
+    .fg {
+      margin-bottom: 18px;
+    }
+
+    .fl {
+      display: block;
+      font-size: .7rem;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: rgba(255, 255, 255, .4);
+      margin-bottom: 7px;
+    }
+
+    .fi {
+      width: 100%;
+      padding: 13px 16px;
+      background: rgba(255, 255, 255, .05);
+      border: 1px solid var(--gb);
+      border-radius: 11px;
+      color: var(--white);
+      font-family: 'DM Sans', sans-serif;
+      font-size: .92rem;
+      outline: none;
+      transition: all .3s;
+    }
+
+    .fi:focus {
+      border-color: var(--teal);
+      background: rgba(10, 147, 150, .08);
+    }
+
+    .fi::placeholder {
+      color: rgba(255, 255, 255, .2);
+    }
+
+    textarea.fi {
+      resize: vertical;
+      min-height: 90px;
+    }
+
+    select.fi option {
+      background: #061E23;
+    }
+
+    .frow {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+
+    .lbtn {
+      width: 100%;
+      padding: 15px;
+      margin-top: 10px;
+      background: linear-gradient(135deg, var(--teal), var(--deep));
+      border: none;
+      border-radius: 11px;
+      color: white;
+      cursor: pointer;
+      font-family: 'DM Sans', sans-serif;
+      font-size: .88rem;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      font-weight: 500;
+      transition: all .3s;
+      box-shadow: 0 8px 28px rgba(10, 147, 150, .4);
+    }
+
+    .lbtn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 14px 40px rgba(10, 147, 150, .6);
+    }
+
+    .lerr {
+      background: rgba(239, 83, 80, .15);
+      border: 1px solid rgba(239, 83, 80, .3);
+      border-radius: 10px;
+      padding: 11px 15px;
+      font-size: .82rem;
+      color: #ef9a9a;
+      margin-top: 14px;
+      display: none;
+      text-align: center;
+    }
+
+    .lhint {
+      text-align: center;
+      margin-top: 22px;
+      font-size: .72rem;
+      color: rgba(255, 255, 255, .18);
+    }
+
+    #admin-screen {
+      display: none;
+      min-height: 100vh;
+      flex-direction: row;
+    }
+
+    .sidebar {
+      width: 258px;
+      min-height: 100vh;
+      flex-shrink: 0;
+      background: rgba(0, 0, 0, .28);
+      border-right: 1px solid var(--gb);
+      padding: 28px 0;
+      position: sticky;
+      top: 0;
+      height: 100vh;
+      overflow-y: auto;
+      backdrop-filter: blur(20px);
+      display: flex;
+      flex-direction: column;
+    }
+
+    .sblogo {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.75rem;
+      font-weight: 600;
+      letter-spacing: 2px;
+      padding: 0 26px;
+      margin-bottom: 3px;
+      background: linear-gradient(135deg, var(--mint), var(--teal));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      display: block;
+    }
+
+    .sbtag {
+      font-size: .62rem;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: rgba(255, 255, 255, .22);
+      padding: 0 26px;
+      margin-bottom: 34px;
+    }
+
+    .sbsec {
+      font-size: .6rem;
+      letter-spacing: 2.5px;
+      text-transform: uppercase;
+      color: rgba(255, 255, 255, .22);
+      padding: 0 26px;
+      margin: 22px 0 6px;
+    }
+
+    .sbnav {
+      list-style: none;
+    }
+
+    .sbnav li a {
+      display: flex;
+      align-items: center;
+      gap: 11px;
+      padding: 11px 26px;
+      font-size: .86rem;
+      color: rgba(255, 255, 255, .48);
+      text-decoration: none;
+      transition: all .2s;
+      border-left: 2px solid transparent;
+      cursor: pointer;
+    }
+
+    .sbnav li a:hover {
+      color: var(--white);
+      background: rgba(255, 255, 255, .03);
+    }
+
+    .sbnav li a.active {
+      color: var(--mint);
+      border-left-color: var(--teal);
+      background: rgba(10, 147, 150, .08);
+    }
+
+    .sbico {
+      font-size: 1rem;
+      width: 20px;
+      text-align: center;
+    }
+
+    .sbbot {
+      margin-top: auto;
+      padding: 22px 26px;
+      border-top: 1px solid var(--gb);
+    }
+
+    .urow {
+      display: flex;
+      align-items: center;
+      gap: 11px;
+    }
+
+    .uavt {
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--teal), var(--deep));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: .85rem;
+      font-weight: 600;
+    }
+
+    .uinfo {
+      flex: 1;
+      overflow: hidden;
+    }
+
+    .uname {
+      font-size: .82rem;
+      font-weight: 500;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .urole {
+      font-size: .66rem;
+      color: rgba(255, 255, 255, .3);
+    }
+
+    .ubtn {
+      background: none;
+      border: none;
+      color: rgba(255, 255, 255, .28);
+      cursor: pointer;
+      font-size: .85rem;
+      transition: color .2s;
+      padding: 4px;
+      flex-shrink: 0;
+    }
+
+    .ubtn:hover {
+      color: var(--danger);
+    }
+
+    .main {
+      flex: 1;
+      padding: 36px 44px;
+      overflow-y: auto;
+      min-height: 100vh;
+    }
+
+    .topbar {
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      margin-bottom: 36px;
+    }
+
+    .pgtitle {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 2rem;
+      font-weight: 300;
+    }
+
+    .pgtitle em {
+      font-style: italic;
+      color: var(--mint);
+    }
+
+    .pgsub {
+      font-size: .72rem;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: var(--teal);
+      margin-bottom: 6px;
+    }
+
+    .tbbtns {
+      display: flex;
+      gap: 10px;
+    }
+
+    .panel {
+      display: none;
+    }
+
+    .panel.active {
+      display: block;
+    }
+
+    .srow {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 18px;
+      margin-bottom: 32px;
+    }
+
+    .sc {
+      background: var(--glass);
+      border: 1px solid var(--gb);
+      border-radius: 15px;
+      padding: 22px;
+      transition: transform .3s;
+    }
+
+    .sc:hover {
+      transform: translateY(-3px);
+    }
+
+    .scl {
+      font-size: .68rem;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: rgba(255, 255, 255, .32);
+      margin-bottom: 10px;
+    }
+
+    .scn {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 2.6rem;
+      font-weight: 300;
+      color: var(--mint);
+      line-height: 1;
+    }
+
+    .scs {
+      font-size: .74rem;
+      margin-top: 5px;
+      color: rgba(255, 255, 255, .3);
+    }
+
+    .btn {
+      padding: 9px 22px;
+      border-radius: 10px;
+      font-family: 'DM Sans', sans-serif;
+      font-size: .78rem;
+      letter-spacing: .8px;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: all .2s;
+      border: none;
+    }
+
+    .bteal {
+      background: linear-gradient(135deg, var(--teal), var(--deep));
+      color: white;
+      box-shadow: 0 4px 14px rgba(10, 147, 150, .35);
+    }
+
+    .bteal:hover {
+      box-shadow: 0 8px 24px rgba(10, 147, 150, .6);
+      transform: translateY(-1px);
+    }
+
+    .bout {
+      background: transparent;
+      border: 1px solid var(--gb);
+      color: rgba(255, 255, 255, .55);
+    }
+
+    .bout:hover {
+      border-color: var(--teal);
+      color: var(--mint);
+    }
+
+    .bdanger {
+      background: rgba(239, 83, 80, .14);
+      border: 1px solid rgba(239, 83, 80, .28);
+      color: #ef9a9a;
+    }
+
+    .bdanger:hover {
+      background: rgba(239, 83, 80, .24);
+    }
+
+    .bsm {
+      padding: 5px 13px;
+      font-size: .7rem;
+    }
+
+    .bwarn {
+      background: rgba(255, 167, 38, .14);
+      border: 1px solid rgba(255, 167, 38, .28);
+      color: #ffa726;
+    }
+
+    .tw {
+      background: var(--glass);
+      border: 1px solid var(--gb);
+      border-radius: 16px;
+      overflow: hidden;
+    }
+
+    .thdr {
+      padding: 18px 22px;
+      border-bottom: 1px solid var(--gb);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .thdr h3 {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.3rem;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    thead tr {
+      background: rgba(10, 147, 150, .1);
+    }
+
+    thead th {
+      padding: 12px 18px;
+      font-size: .68rem;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--teal);
+      text-align: left;
+      font-weight: 500;
+    }
+
+    tbody tr {
+      border-top: 1px solid var(--gb);
+      transition: background .2s;
+    }
+
+    tbody tr:hover {
+      background: rgba(255, 255, 255, .025);
+    }
+
+    td {
+      padding: 14px 18px;
+      font-size: .85rem;
+      color: rgba(255, 255, 255, .65);
+      vertical-align: middle;
+    }
+
+    .tn {
+      font-weight: 500;
+      color: var(--white);
+    }
+
+    .ts {
+      font-size: .72rem;
+      color: var(--teal);
+      margin-top: 2px;
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 3px 10px;
+      border-radius: 50px;
+      font-size: .65rem;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+    }
+
+    .ba {
+      background: rgba(38, 166, 154, .2);
+      border: 1px solid rgba(38, 166, 154, .35);
+      color: #80cbc4;
+    }
+
+    .bd {
+      background: rgba(255, 167, 38, .14);
+      border: 1px solid rgba(255, 167, 38, .28);
+      color: #ffa726;
+    }
+
+    .bf {
+      background: rgba(10, 147, 150, .2);
+      border: 1px solid var(--teal);
+      color: var(--mint);
+    }
+
+    .tda {
+      display: flex;
+      gap: 7px;
+    }
+
+    .moverlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, .78);
+      z-index: 1000;
+      backdrop-filter: blur(8px);
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .moverlay.open {
+      display: flex;
+    }
+
+    .modal {
+      background: rgba(4, 22, 28, .97);
+      border: 1px solid var(--gb);
+      border-radius: 22px;
+      padding: 40px;
+      width: 620px;
+      max-width: 95vw;
+      max-height: 90vh;
+      overflow-y: auto;
+      box-shadow: 0 40px 80px rgba(0, 0, 0, .6);
+      animation: mIn .28s ease;
+      position: relative;
+    }
+
+    @keyframes mIn {
+      from {
+        opacity: 0;
+        transform: scale(.94) translateY(18px)
+      }
+
+      to {
+        opacity: 1;
+        transform: none
+      }
+    }
+
+    .mclose {
+      position: absolute;
+      top: 14px;
+      right: 18px;
+      background: none;
+      border: none;
+      color: rgba(255, 255, 255, .35);
+      font-size: 1.35rem;
+      cursor: pointer;
+      transition: color .2s;
+    }
+
+    .mclose:hover {
+      color: white;
+    }
+
+    .mfooter {
+      display: flex;
+      gap: 10px;
+      justify-content: flex-end;
+      margin-top: 28px;
+      padding-top: 22px;
+      border-top: 1px solid var(--gb);
+    }
+
+    .cblock {
+      background: var(--glass);
+      border: 1px solid var(--gb);
+      border-radius: 16px;
+      padding: 28px;
+      margin-bottom: 18px;
+    }
+
+    .cblock h4 {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.25rem;
+      margin-bottom: 20px;
+      color: var(--mint);
+    }
+
+    .sgrid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 18px;
+    }
+
+    .scard {
+      background: var(--glass);
+      border: 1px solid var(--gb);
+      border-radius: 16px;
+      padding: 26px;
+    }
+
+    .scard h4 {
+      font-size: .92rem;
+      margin-bottom: 5px;
+    }
+
+    .sdesc {
+      font-size: .78rem;
+      color: rgba(255, 255, 255, .38);
+      margin-bottom: 18px;
+      line-height: 1.6;
+    }
+
+    .tglrow {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 9px 0;
+      border-bottom: 1px solid rgba(255, 255, 255, .05);
+    }
+
+    .tglrow:last-child {
+      border-bottom: none;
+    }
+
+    .tgllabel {
+      font-size: .82rem;
+      color: rgba(255, 255, 255, .55);
+    }
+
+    .tgl {
+      width: 42px;
+      height: 22px;
+      border-radius: 50px;
+      cursor: pointer;
+      position: relative;
+      transition: background .3s;
+      border: none;
+      background: rgba(255, 255, 255, .1);
+    }
+
+    .tgl.on {
+      background: var(--teal);
+    }
+
+    .tgl::after {
+      content: '';
+      position: absolute;
+      top: 3px;
+      left: 3px;
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      background: white;
+      transition: transform .3s;
+    }
+
+    .tgl.on::after {
+      transform: translateX(20px);
+    }
+
+    .upzone {
+      border: 2px dashed var(--gb);
+      border-radius: 11px;
+      padding: 28px;
+      text-align: center;
+      cursor: pointer;
+      transition: all .3s;
+      color: rgba(255, 255, 255, .32);
+      font-size: .82rem;
+    }
+
+    .upzone:hover {
+      border-color: var(--teal);
+      color: var(--mint);
+      background: rgba(10, 147, 150, .05);
+    }
+
+    .upico {
+      font-size: 1.8rem;
+      margin-bottom: 6px;
+    }
+
+    .qgrid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    .qtile {
+      padding: 16px 20px;
+      background: var(--glass);
+      border: 1px solid var(--gb);
+      border-radius: 13px;
+      cursor: pointer;
+      text-align: left;
+      color: var(--white);
+      font-family: 'DM Sans', sans-serif;
+      font-size: .85rem;
+      transition: all .2s;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .qtile:hover {
+      border-color: var(--teal);
+      background: rgba(10, 147, 150, .08);
+    }
+
+    .toast {
+      position: fixed;
+      bottom: 26px;
+      right: 26px;
+      z-index: 9999;
+      padding: 12px 20px;
+      border-radius: 11px;
+      font-size: .84rem;
+      background: rgba(38, 166, 154, .92);
+      color: white;
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(38, 166, 154, .5);
+      box-shadow: 0 8px 24px rgba(0, 0, 0, .3);
+      transform: translateY(80px);
+      opacity: 0;
+      transition: all .38s;
+      pointer-events: none;
+    }
+
+    .toast.show {
+      transform: translateY(0);
+      opacity: 1;
+    }
+
+    @media(max-width:900px) {
+      .sidebar {
+        display: none;
+      }
+
+      .main {
+        padding: 20px;
+      }
+
+      .srow {
+        grid-template-columns: 1fr 1fr;
+      }
+
+      .frow {
+        grid-template-columns: 1fr;
+      }
+
+      .sgrid {
+        grid-template-columns: 1fr;
+      }
+
+      .qgrid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <div id="login-screen">
+    <div class="lorb" style="width:500px;height:500px;top:-200px;right:-100px;"></div>
+    <div class="lorb"
+      style="width:300px;height:300px;bottom:-100px;left:-50px;background:radial-gradient(circle,var(--deep),transparent);">
+    </div>
+    <div class="lcard">
+      <img src="logo.png" alt="iPure" style="height:60px;width:auto;object-fit:contain;display:block;margin:0 auto 6px;"
+        onerror="this.style.display='none';this.nextSibling.style.display='block';" /><span class="llogo"
+        style="display:none;">iPure</span>
+      <div class="lsub">Admin Control Panel</div>
+      <div class="fg"><label class="fl">Username</label><input type="text" id="iu" class="fi"
+          placeholder="Enter username" autocomplete="username" /></div>
+      <div class="fg"><label class="fl">Password</label><input type="password" id="ip" class="fi"
+          placeholder="Enter password" autocomplete="current-password" /></div>
+      <button class="lbtn" onclick="doLogin()">Access Dashboard →</button>
+      <div class="lerr" id="lerr">Invalid credentials. Please try again.</div>
+      <p class="lhint">Default: admin / ipure2025</p>
+    </div>
+  </div>
+
+  <div id="admin-screen">
+    <aside class="sidebar">
+      <img src="logo.png" alt="iPure" style="height:40px;width:auto;object-fit:contain;display:block;margin:0 26px 3px;"
+        onerror="this.style.display='none';this.nextSibling.style.display='block';" /><span class="sblogo"
+        style="display:none;">iPure</span>
+      <span class="sbtag">Admin Panel</span>
+      <span class="sbsec">Main</span>
+      <ul class="sbnav">
+        <li><a class="active" onclick="showPanel('dash',this)"><span class="sbico">📊</span> Dashboard</a></li>
+        <li><a onclick="showPanel('prods',this)"><span class="sbico">🌬️</span> Products</a></li>
+        <li><a onclick="showPanel('content',this)"><span class="sbico">✏️</span> Site Content</a></li>
+        <li><a onclick="showPanel('leads',this)"><span class="sbico">📦</span> Leads & Orders</a></li>
+      </ul>
+      <span class="sbsec">System</span>
+      <ul class="sbnav">
+        <li><a onclick="showPanel('settings',this)"><span class="sbico">⚙️</span> Settings</a></li>
+        <li><a href="index.html" target="_blank"><span class="sbico">🌐</span> View Website ↗</a></li>
+      </ul>
+      <div class="sbbot">
+        <div class="urow">
+          <div class="uavt">A</div>
+          <div class="uinfo">
+            <div class="uname" id="sb-un">Admin</div>
+            <div class="urole">Super Admin</div>
+          </div>
+          <button class="ubtn" onclick="doLogout()" title="Logout">⏻</button>
+        </div>
+      </div>
+    </aside>
+
+    <main class="main">
+
+      <!-- DASHBOARD -->
+      <div class="panel active" id="panel-dash">
+        <div class="topbar">
+          <div>
+            <div class="pgsub">Overview</div>
+            <h1 class="pgtitle">Good day, <em>Admin</em></h1>
+          </div>
+          <div class="tbbtns"><button class="btn bteal" onclick="showPanel('prods',null);openAdd()">+ Add
+              Product</button></div>
+        </div>
+        <div class="srow">
+          <div class="sc">
+            <div class="scl">Total Products</div>
+            <div class="scn" id="d-tot">4</div>
+            <div class="scs">Active listings</div>
+          </div>
+          <div class="sc">
+            <div class="scl">Inquiries This Month</div>
+            <div class="scn">24</div>
+            <div class="scs">↑ 12% vs last month</div>
+          </div>
+          <div class="sc">
+            <div class="scl">Featured Products</div>
+            <div class="scn" id="d-feat">1</div>
+            <div class="scs">Shown on homepage</div>
+          </div>
+          <div class="sc">
+            <div class="scl">HQ Location</div>
+            <div class="scn" style="font-size:1.4rem;margin-top:4px;">Accra</div>
+            <div class="scs">Ghana, West Africa</div>
+          </div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:22px;">
+          <div class="tw">
+            <div class="thdr">
+              <h3>Products</h3><button class="btn bout bsm" onclick="showPanel('prods',null)">View All</button>
+            </div>
+            <table>
+              <thead>
+                <tr>
+                  <th>Product</th>
+                  <th>Price</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody id="d-plist"></tbody>
+            </table>
+          </div>
+          <div class="scard">
+            <h4 style="font-family:'Cormorant Garamond',serif;font-size:1.3rem;margin-bottom:18px;">Quick Actions</h4>
+            <div class="qgrid">
+              <button class="qtile" onclick="showPanel('prods',null);openAdd()">🌬️ Add New Product</button>
+              <button class="qtile" onclick="showPanel('content',null)">✏️ Edit Site Content</button>
+              <button class="qtile" onclick="showPanel('leads',null)">📦 View Leads</button>
+              <a href="index.html" target="_blank" class="qtile" style="text-decoration:none;">🌐 Preview Site ↗</a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- PRODUCTS -->
+      <div class="panel" id="panel-prods">
+        <div class="topbar">
+          <div>
+            <div class="pgsub">Catalog</div>
+            <h1 class="pgtitle">Product <em>Management</em></h1>
+          </div>
+          <div class="tbbtns"><button class="btn bout" onclick="exportCSV()">↓ Export CSV</button><button
+              class="btn bteal" onclick="openAdd()">+ Add Product</button></div>
+        </div>
+        <div class="tw">
+          <table>
+            <thead>
+              <tr>
+                <th>Product</th>
+                <th>Category</th>
+                <th>Price</th>
+                <th>Coverage</th>
+                <th>Status</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="p-list"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- CONTENT -->
+      <div class="panel" id="panel-content">
+        <div class="topbar">
+          <div>
+            <div class="pgsub">Website</div>
+            <h1 class="pgtitle">Site <em>Content</em></h1>
+          </div><button class="btn bteal" onclick="showT('Site content saved ✓')">Save Changes</button>
+        </div>
+        <div class="cblock">
+          <h4>Hero Section</h4>
+          <div class="fg"><label class="fl">Main Headline</label><input type="text" class="fi"
+              value="Breathe iPure. Live Clean." /></div>
+          <div class="fg"><label class="fl">Subtitle</label><textarea
+              class="fi">Hospital-grade air purification engineered for African environments. Smart. Affordable. Proudly African.</textarea>
+          </div>
+          <div class="frow">
+            <div class="fg"><label class="fl">CTA Button 1</label><input type="text" class="fi"
+                value="Shop All Products" /></div>
+            <div class="fg"><label class="fl">CTA Button 2</label><input type="text" class="fi"
+                value="See How It Works" /></div>
+          </div>
+        </div>
+        <div class="cblock">
+          <h4>About Section</h4>
+          <div class="fg"><label class="fl">Company Description</label><textarea
+              class="fi">iPure Air Purifier is a modern air purification brand designed for African environments, starting with Ghana.</textarea>
+          </div>
+          <div class="frow">
+            <div class="fg"><label class="fl">HQ City</label><input type="text" class="fi" value="Accra" /></div>
+            <div class="fg"><label class="fl">HQ Country</label><input type="text" class="fi" value="Ghana" /></div>
+          </div>
+        </div>
+        <div class="cblock">
+          <h4>Contact & Footer</h4>
+          <div class="frow">
+            <div class="fg"><label class="fl">Primary Email</label><input type="email" class="fi"
+                value="contact@ipureair.com" /></div>
+            <div class="fg"><label class="fl">Sales Email</label><input type="email" class="fi"
+                value="sales@ipureair.com" /></div>
+          </div>
+          <div class="frow">
+            <div class="fg"><label class="fl">Phone / WhatsApp</label><input type="text" class="fi"
+                value="+233 (0) 000 000 000" /></div>
+            <div class="fg"><label class="fl">Address</label><input type="text" class="fi" value="Accra, Ghana" /></div>
+          </div>
+          <div class="fg"><label class="fl">Footer Tagline</label><input type="text" class="fi"
+              value="Africa's premier intelligent air purification brand." /></div>
+        </div>
+        <div class="cblock">
+          <h4>Promotional Banner</h4>
+          <div class="fg"><label class="fl">Promo Message</label><input type="text" class="fi"
+              value="10% discount for first 100 institutional clients · Free installation on bulk orders · 5-year warranty" />
+          </div>
+          <div class="tglrow" style="margin-top:12px;"><span class="tgllabel">Show promo bar on homepage</span><button
+              class="tgl on" onclick="this.classList.toggle('on')"></button></div>
+        </div>
+      </div>
+
+      <!-- LEADS -->
+      <div class="panel" id="panel-leads">
+        <div class="topbar">
+          <div>
+            <div class="pgsub">B2B Pipeline</div>
+            <h1 class="pgtitle">Leads & <em>Inquiries</em></h1>
+          </div><button class="btn bout" onclick="showT('Exporting to CSV...')">↓ Export CSV</button>
+        </div>
+        <div class="tw">
+          <table>
+            <thead>
+              <tr>
+                <th>Organization</th>
+                <th>Contact</th>
+                <th>Interest</th>
+                <th>Date</th>
+                <th>Status</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>
+                  <div class="tn">St. Luke's Hospital</div>
+                  <div class="ts">Accra, Ghana</div>
+                </td>
+                <td style="font-size:.78rem;">procurement@stlukes.gh</td>
+                <td>PureMax Pro × 20</td>
+                <td>Mar 3, 2025</td>
+                <td><span class="badge ba">New</span></td>
+                <td>
+                  <div class="tda"><button class="btn bout bsm" onclick="showT('Lead opened')">View</button><button
+                      class="btn bwarn bsm" onclick="showT('Marked In Progress')">Follow Up</button></div>
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  <div class="tn">Kempinski Hotel Gold Coast</div>
+                  <div class="ts">Accra, Ghana</div>
+                </td>
+                <td style="font-size:.78rem;">facilities@kempinski.com.gh</td>
+                <td>SmartCore × 40</td>
+                <td>Mar 1, 2025</td>
+                <td><span class="badge bf">In Progress</span></td>
+                <td>
+                  <div class="tda"><button class="btn bout bsm" onclick="showT('Lead opened')">View</button><button
+                      class="btn bteal bsm" onclick="showT('Quote sent!')">Send Quote</button></div>
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  <div class="tn">GCB Bank Ltd</div>
+                  <div class="ts">Multiple branches, GH</div>
+                </td>
+                <td style="font-size:.78rem;">cfo@gcb.com.gh</td>
+                <td>Mixed fleet × 30</td>
+                <td>Feb 27, 2025</td>
+                <td><span class="badge bd">Quoted</span></td>
+                <td>
+                  <div class="tda"><button class="btn bout bsm" onclick="showT('Lead opened')">View</button><button
+                      class="btn bout bsm" onclick="showT('Reminder sent')">Remind</button></div>
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  <div class="tn">University of Ghana</div>
+                  <div class="ts">Legon, Accra</div>
+                </td>
+                <td style="font-size:.78rem;">facilities@ug.edu.gh</td>
+                <td>SmartCore × 15</td>
+                <td>Feb 22, 2025</td>
+                <td><span class="badge ba">New</span></td>
+                <td>
+                  <div class="tda"><button class="btn bout bsm" onclick="showT('Lead opened')">View</button><button
+                      class="btn bwarn bsm" onclick="showT('Follow-up scheduled')">Follow Up</button></div>
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  <div class="tn">Korle-Bu Teaching Hospital</div>
+                  <div class="ts">Accra, Ghana</div>
+                </td>
+                <td style="font-size:.78rem;">procurement@kbth.gov.gh</td>
+                <td>PureMax Pro × 50</td>
+                <td>Feb 18, 2025</td>
+                <td><span class="badge bf">In Progress</span></td>
+                <td>
+                  <div class="tda"><button class="btn bout bsm" onclick="showT('Lead opened')">View</button><button
+                      class="btn bteal bsm" onclick="showT('Quote sent!')">Send Quote</button></div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- SETTINGS -->
+      <div class="panel" id="panel-settings">
+        <div class="topbar">
+          <div>
+            <div class="pgsub">Configuration</div>
+            <h1 class="pgtitle">Admin <em>Settings</em></h1>
+          </div><button class="btn bteal" onclick="showT('Settings saved ✓')">Save Settings</button>
+        </div>
+        <div class="sgrid">
+          <div class="scard">
+            <h4>Change Password</h4>
+            <p class="sdesc">Update the admin panel login password.</p>
+            <div class="fg"><label class="fl">Current Password</label><input type="password" class="fi" id="pc"
+                placeholder="Current password" /></div>
+            <div class="fg"><label class="fl">New Password</label><input type="password" class="fi" id="pn"
+                placeholder="New password (min 6 chars)" /></div>
+            <div class="fg"><label class="fl">Confirm New Password</label><input type="password" class="fi" id="pk"
+                placeholder="Confirm new password" /></div>
+            <button class="btn bteal" onclick="changePw()" style="width:100%;">Update Password</button>
+          </div>
+          <div class="scard">
+            <h4>Website Feature Toggles</h4>
+            <p class="sdesc">Control what's visible on the public website.</p>
+            <div class="tglrow"><span class="tgllabel">Show Product Pricing</span><button class="tgl" id="price-tgl"></button></div>
+            <div class="tglrow"><span class="tgllabel">Enable Contact Form</span><button class="tgl on"
+                onclick="this.classList.toggle('on')"></button></div>
+            <div class="tglrow"><span class="tgllabel">Stats Bar (homepage)</span><button class="tgl on"
+                onclick="this.classList.toggle('on')"></button></div>
+            <div class="tglrow"><span class="tgllabel">Launch Promo Banner</span><button class="tgl"
+                onclick="this.classList.toggle('on')"></button></div>
+            <div class="tglrow"><span class="tgllabel">How It Works Section</span><button class="tgl on"
+                onclick="this.classList.toggle('on')"></button></div>
+            <div class="tglrow"><span class="tgllabel">Admin Link in Footer</span><button class="tgl on"
+                onclick="this.classList.toggle('on')"></button></div>
+          </div>
+          <div class="scard">
+            <h4>Brand Colors</h4>
+            <p class="sdesc">Customize the website color palette.</p>
+            <div class="fg"><label class="fl">Primary Teal</label><input type="color" value="#0A9396" class="fi"
+                style="height:44px;padding:4px 8px;cursor:pointer;" /></div>
+            <div class="fg"><label class="fl">Accent Mint</label><input type="color" value="#94D2BD" class="fi"
+                style="height:44px;padding:4px 8px;cursor:pointer;" /></div>
+            <div class="fg"><label class="fl">Background Dark</label><input type="color" value="#03242B" class="fi"
+                style="height:44px;padding:4px 8px;cursor:pointer;" /></div>
+            <button class="btn bteal" style="width:100%;margin-top:4px;" onclick="showT('Colors saved ✓')">Apply
+              Colors</button>
+          </div>
+          <div class="scard">
+            <h4>Admin Account</h4>
+            <p class="sdesc">Update your admin username and display name.</p>
+            <div class="fg"><label class="fl">Admin Username</label><input type="text" class="fi" id="su"
+                value="admin" /></div>
+            <div class="fg"><label class="fl">Display Name</label><input type="text" class="fi" id="sd" value="Admin" />
+            </div>
+            <button class="btn bteal" style="width:100%;" onclick="saveAcct()">Save Account</button>
+            <div style="margin-top:24px;padding-top:18px;border-top:1px solid var(--gb);">
+              <p class="sdesc" style="margin-bottom:12px;">Danger Zone</p>
+              <button class="btn bdanger" style="width:100%;"
+                onclick="if(confirm('Reset all data?'))showT('Data reset complete')">Reset All Data to Defaults</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- PRODUCT MODAL -->
+  <div class="moverlay" id="pm">
+    <div class="modal">
+      <button class="mclose" onclick="closePM()">✕</button>
+      <input type="hidden" id="eidx" value="-1" />
+      <div class="pgsub" id="msub">New Product</div>
+      <h2 style="font-family:'Cormorant Garamond',serif;font-size:1.9rem;margin-bottom:28px;" id="mtitle">Add <em
+          style="font-style:italic;color:var(--mint)">Product</em></h2>
+      <div class="frow">
+        <div class="fg"><label class="fl">Product Name</label><input type="text" class="fi" id="pname"
+            placeholder="e.g. iPure PureMax Pro" /></div>
+        <div class="fg"><label class="fl">Model / SKU</label><input type="text" class="fi" id="psku"
+            placeholder="e.g. PMX-PRO-001" /></div>
+      </div>
+      <div class="frow">
+        <div class="fg"><label class="fl">Category</label><select class="fi" id="pcat">
+            <option>Hospital Grade</option>
+            <option>Commercial</option>
+            <option>Residential</option>
+            <option>Portable</option>
+            <option>Accessories</option>
+            <option>Industrial</option>
+          </select></div>
+        <div class="fg"><label class="fl">Price (GHS &#8373;)</label><input type="number" class="fi" id="pprice"
+            placeholder="e.g. 4890" /></div>
+      </div>
+      <div class="frow">
+        <div class="fg"><label class="fl">CADR (m³/h)</label><input type="text" class="fi" id="pcadr"
+            placeholder="e.g. 500+" /></div>
+        <div class="fg"><label class="fl">Coverage Area (m²)</label><input type="text" class="fi" id="pcov"
+            placeholder="e.g. 80" /></div>
+      </div>
+      <div class="fg"><label class="fl">Short Description</label><textarea class="fi" id="pdesc"
+          placeholder="Website product description..."></textarea></div>
+      <div class="fg"><label class="fl">Key Features (one per line)</label><textarea class="fi" id="pfeats"
+          placeholder="HEPA H13 filter&#10;UV-C sterilization&#10;Smart app control"></textarea></div>
+      <div class="frow">
+        <div class="fg"><label class="fl">Status</label><select class="fi" id="pstat">
+            <option>Active</option>
+            <option>Draft</option>
+            <option>Featured</option>
+          </select></div>
+        <div class="fg"><label class="fl">Badge Label</label><input type="text" class="fi" id="pbadge"
+            placeholder="e.g. Most Popular" /></div>
+      </div>
+      <div class="fg"><label class="fl">Product Image</label>
+        <div class="upzone" onclick="document.getElementById('imgf').click()">
+          <div class="upico">🖼️</div>
+          <div>Click to upload product image</div>
+          <div style="font-size:.72rem;margin-top:4px;color:rgba(255,255,255,.18);">PNG · JPG · WebP · Max 5MB</div>
+          <input type="file" id="imgf" accept="image/*" style="display:none" onchange="prevImg(this)" />
+        </div>
+        <div id="iprev" style="margin-top:10px;display:none;"><img id="pimg"
+            style="width:76px;height:76px;object-fit:cover;border-radius:10px;border:1px solid var(--gb);" /></div>
+      </div>
+      <div class="mfooter"><button class="btn bout" onclick="closePM()">Cancel</button><button class="btn bteal"
+          onclick="saveProd()">Save Product</button></div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <script>
+    const CREDS = { u: 'admin', p: 'ipure2025' };
+
+    // ── DEFAULT PRODUCTS (GHS pricing) ──
+    const DEFAULT_PRODUCTS = [
+      { name: 'iPure PureMax Pro', sku: 'PMX-PRO-001', cat: 'Hospital Grade', price: 4890, cadr: '500+', cov: '80', desc: 'Hospital-grade purifier with UV-C sterilization.', feats: 'UV-C sterilization\nHEPA H13 filter\nCADR 500+ m\u00b3/h\nSmart app', status: 'Featured', badge: 'Hospital Grade' },
+      { name: 'iPure SmartCore', sku: 'SMC-001', cat: 'Commercial', price: 2790, cadr: '380+', cov: '60', desc: 'Smart connected purifier for offices and hotels.', feats: 'CADR 380+ m\u00b3/h\niPure Smart App\nChild lock\nSleep mode', status: 'Active', badge: 'Most Popular' },
+      { name: 'iPure MiniAir', sku: 'MNA-001', cat: 'Portable', price: 1250, cadr: '180', cov: '25', desc: 'Compact portable purifier for homes and hotel rooms.', feats: 'CADR 180 m\u00b3/h\n360\u00b0 air intake\nUltra-quiet 22dB', status: 'Active', badge: 'Portable' },
+      { name: 'Filter Replacement Pack', sku: 'FILT-ALL', cat: 'Accessories', price: 410, cadr: 'N/A', cov: 'N/A', desc: 'HEPA H13 replacement filters for all iPure models.', feats: 'HEPA H13 grade\nEasy swap\n6-12 month lifespan', status: 'Active', badge: 'Essential' },
+    ];
+
+    let products = JSON.parse(localStorage.getItem('ipure_products') || 'null') || JSON.parse(JSON.stringify(DEFAULT_PRODUCTS));
+    let settings = JSON.parse(localStorage.getItem('ipure_settings') || '{"showPrice":false}');
+
+    function saveToStorage() {
+      localStorage.setItem('ipure_products', JSON.stringify(products));
+      localStorage.setItem('ipure_settings', JSON.stringify(settings));
+    }
+
+    // ── PRICE TOGGLE ──
+    const priceToggle = document.getElementById('price-tgl');
+    function syncToggleUI() {
+      if (settings.showPrice) priceToggle.classList.add('on');
+      else priceToggle.classList.remove('on');
+    }
+    priceToggle.addEventListener('click', () => {
+      settings.showPrice = !settings.showPrice;
+      syncToggleUI();
+      saveToStorage();
+      showT(settings.showPrice ? 'Prices visible on site ✓' : 'Prices hidden on site ✓');
+    });
+    syncToggleUI();
+
+    function doLogin() {
+      const u = document.getElementById('iu').value.trim();
+      const p = document.getElementById('ip').value;
+      if (u === CREDS.u && p === CREDS.p) {
+        document.getElementById('login-screen').style.display = 'none';
+        document.getElementById('admin-screen').style.display = 'flex';
+        document.getElementById('sb-un').textContent = document.getElementById('sd')?.value || u;
+        renderProds(); renderDash();
+      } else { const e = document.getElementById('lerr'); e.style.display = 'block'; setTimeout(() => e.style.display = 'none', 3000); }
+    }
+    document.getElementById('ip').addEventListener('keydown', e => { if (e.key === 'Enter') doLogin(); });
+    document.getElementById('iu').addEventListener('keydown', e => { if (e.key === 'Enter') doLogin(); });
+
+    function doLogout() { document.getElementById('admin-screen').style.display = 'none'; document.getElementById('login-screen').style.display = 'flex'; document.getElementById('iu').value = ''; document.getElementById('ip').value = ''; }
+
+    function renderProds() {
+      document.getElementById('p-list').innerHTML = products.map((p, i) => `<tr><td><div class="tn">${p.name}</div><div class="ts">${p.sku}</div></td><td>${p.cat}</td><td>&#8373;${Number(p.price).toLocaleString()}</td><td>${p.cov !== 'N/A' ? p.cov + 'm\u00b2' : '\u2014'}</td><td><span class="badge ${p.status === 'Active' ? 'ba' : p.status === 'Featured' ? 'bf' : 'bd'}">${p.status}</span></td><td><div class="tda"><button class="btn bout bsm" onclick="editP(${i})">Edit</button><button class="btn bdanger bsm" onclick="delP(${i})">Delete</button></div></td></tr>`).join('');
+    }
+    function renderDash() {
+      document.getElementById('d-plist').innerHTML = products.slice(0, 4).map(p => `<tr><td><div class="tn">${p.name}</div><div class="ts">${p.cat}</div></td><td>&#8373;${Number(p.price).toLocaleString()}</td><td><span class="badge ${p.status === 'Active' ? 'ba' : p.status === 'Featured' ? 'bf' : 'bd'}">${p.status}</span></td></tr>`).join('');
+      document.getElementById('d-tot').textContent = products.length;
+      document.getElementById('d-feat').textContent = products.filter(p => p.status === 'Featured').length;
+    }
+    function openAdd() {
+      document.getElementById('mtitle').innerHTML = 'Add <em style="font-style:italic;color:var(--mint)">Product</em>';
+      document.getElementById('msub').textContent = 'New Product';
+      document.getElementById('eidx').value = -1;
+      ['pname', 'psku', 'pprice', 'pcadr', 'pcov', 'pdesc', 'pfeats', 'pbadge'].forEach(id => document.getElementById(id).value = '');
+      document.getElementById('pcat').value = 'Hospital Grade'; document.getElementById('pstat').value = 'Active';
+      document.getElementById('iprev').style.display = 'none';
+      document.getElementById('pm').classList.add('open');
+    }
+    function editP(i) {
+      const p = products[i];
+      document.getElementById('mtitle').innerHTML = 'Edit <em style="font-style:italic;color:var(--mint)">Product</em>';
+      document.getElementById('msub').textContent = p.name;
+      document.getElementById('eidx').value = i;
+      document.getElementById('pname').value = p.name; document.getElementById('psku').value = p.sku;
+      document.getElementById('pcat').value = p.cat; document.getElementById('pprice').value = p.price;
+      document.getElementById('pcadr').value = p.cadr; document.getElementById('pcov').value = p.cov;
+      document.getElementById('pdesc').value = p.desc; document.getElementById('pfeats').value = p.feats;
+      document.getElementById('pstat').value = p.status; document.getElementById('pbadge').value = p.badge;
+      document.getElementById('pm').classList.add('open');
+    }
+    function closePM() { document.getElementById('pm').classList.remove('open'); }
+    function saveProd() {
+      const idx = parseInt(document.getElementById('eidx').value);
+      const prod = { name: document.getElementById('pname').value || 'Untitled', sku: document.getElementById('psku').value || 'N/A', cat: document.getElementById('pcat').value, price: parseFloat(document.getElementById('pprice').value) || 0, cadr: document.getElementById('pcadr').value, cov: document.getElementById('pcov').value, desc: document.getElementById('pdesc').value, feats: document.getElementById('pfeats').value, status: document.getElementById('pstat').value, badge: document.getElementById('pbadge').value };
+      if (idx >= 0) { products[idx] = prod; showT('Product updated ✓'); } else { products.unshift(prod); showT('Product added ✓'); }
+      saveToStorage();
+      closePM(); renderProds(); renderDash();
+    }
+    function delP(i) { if (confirm(`Delete "${products[i].name}"?`)) { products.splice(i, 1); saveToStorage(); renderProds(); renderDash(); showT('Product deleted'); } }
+    function exportCSV() { const csv = 'Name,SKU,Category,Price (GHS),CADR,Coverage,Status\n' + products.map(p => `"${p.name}","${p.sku}","${p.cat}","\u20b5${p.price}","${p.cadr}","${p.cov}","${p.status}"`).join('\n'); const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([csv], { type: 'text/csv' })); a.download = 'ipure-products.csv'; a.click(); showT('CSV exported ✓'); }
+
+    function showPanel(name, el) {
+      document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+      document.getElementById('panel-' + name).classList.add('active');
+      document.querySelectorAll('.sbnav li a').forEach(a => a.classList.remove('active'));
+      if (el) el.classList.add('active');
+    }
+    function changePw() {
+      const cur = document.getElementById('pc').value, nw = document.getElementById('pn').value, cn = document.getElementById('pk').value;
+      if (cur !== CREDS.p) { showT('Current password incorrect', 'e'); return; }
+      if (nw !== cn) { showT('Passwords do not match', 'e'); return; }
+      if (nw.length < 6) { showT('Minimum 6 characters', 'e'); return; }
+      CREDS.p = nw; document.getElementById('pc').value = ''; document.getElementById('pn').value = ''; document.getElementById('pk').value = ''; showT('Password updated ✓');
+    }
+    function saveAcct() { const u = document.getElementById('su').value, d = document.getElementById('sd').value; if (!u) { showT('Username required', 'e'); return; } CREDS.u = u; document.getElementById('sb-un').textContent = d || u; showT('Account saved ✓'); }
+    function prevImg(input) { if (input.files && input.files[0]) { const r = new FileReader(); r.onload = e => { document.getElementById('pimg').src = e.target.result; document.getElementById('iprev').style.display = 'block'; }; r.readAsDataURL(input.files[0]); } }
+    function showT(msg, type = 's') { const t = document.getElementById('toast'); t.textContent = msg; t.style.background = type === 'e' ? 'rgba(239,83,80,.92)' : 'rgba(38,166,154,.92)'; t.classList.add('show'); setTimeout(() => t.classList.remove('show'), 3200); }
+    document.getElementById('pm').addEventListener('click', e => { if (e.target === document.getElementById('pm')) closePM(); });
+  </script>
+</body>
+
+</html>
