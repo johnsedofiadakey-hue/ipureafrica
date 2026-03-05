@@ -2053,7 +2053,8 @@
           <div>
             <span class="section-label reveal">Filtration Process</span>
             <h3 class="section-title reveal" style="font-size:clamp(2rem,4vw,3rem);margin-bottom:36px;">How iPure
-              <em>Works</em></h3>
+              <em>Works</em>
+            </h3>
             <ul class="how-steps">
               <li class="how-step">
                 <div class="step-num">01</div>
@@ -3297,6 +3298,14 @@
       document.querySelectorAll('.price-display').forEach(el => {
         el.style.display = settings.showPrice ? '' : 'none';
       });
+
+      // Logo sync
+      const customLogo = localStorage.getItem('ipure_logo');
+      if (customLogo) {
+        document.querySelectorAll('img[alt="iPure"]').forEach(img => img.src = customLogo);
+      } else {
+        document.querySelectorAll('img[alt="iPure"]').forEach(img => img.src = 'logo.png');
+      }
 
       // Products: rebuild product cards from admin data
       const products = JSON.parse(localStorage.getItem('ipure_products') || 'null');

@@ -1154,7 +1154,8 @@
           <div class="scard">
             <h4>Website Feature Toggles</h4>
             <p class="sdesc">Control what's visible on the public website.</p>
-            <div class="tglrow"><span class="tgllabel">Show Product Pricing</span><button class="tgl" id="price-tgl"></button></div>
+            <div class="tglrow"><span class="tgllabel">Show Product Pricing</span><button class="tgl"
+                id="price-tgl"></button></div>
             <div class="tglrow"><span class="tgllabel">Enable Contact Form</span><button class="tgl on"
                 onclick="this.classList.toggle('on')"></button></div>
             <div class="tglrow"><span class="tgllabel">Stats Bar (homepage)</span><button class="tgl on"
@@ -1165,6 +1166,18 @@
                 onclick="this.classList.toggle('on')"></button></div>
             <div class="tglrow"><span class="tgllabel">Admin Link in Footer</span><button class="tgl on"
                 onclick="this.classList.toggle('on')"></button></div>
+          </div>
+          <div class="scard">
+            <h4>Site Logo</h4>
+            <p class="sdesc">Upload a custom transparent image to replace the default logo across the site.</p>
+            <div class="upzone" onclick="document.getElementById('site-logo-up').click()" style="padding:18px;">
+              <div class="upico" style="font-size:1.4rem;margin-bottom:4px;">☁️</div>
+              Click to select logo file
+            </div>
+            <input type="file" id="site-logo-up" accept="image/png, image/jpeg, image/svg+xml, image/webp"
+              style="display:none;" onchange="handleLogoUpload(this)">
+            <button class="btn bdanger" style="width:100%;margin-top:12px;display:none;" id="reset-logo-btn"
+              onclick="resetLogo()">Reset to Default Logo</button>
           </div>
           <div class="scard">
             <h4>Brand Colors</h4>
@@ -1364,6 +1377,38 @@
     function prevImg(input) { if (input.files && input.files[0]) { const r = new FileReader(); r.onload = e => { document.getElementById('pimg').src = e.target.result; document.getElementById('iprev').style.display = 'block'; }; r.readAsDataURL(input.files[0]); } }
     function showT(msg, type = 's') { const t = document.getElementById('toast'); t.textContent = msg; t.style.background = type === 'e' ? 'rgba(239,83,80,.92)' : 'rgba(38,166,154,.92)'; t.classList.add('show'); setTimeout(() => t.classList.remove('show'), 3200); }
     document.getElementById('pm').addEventListener('click', e => { if (e.target === document.getElementById('pm')) closePM(); });
+// --- LOGO UPLOAD ---
+function handleLogoUpload(input) {
+  if (input.files && input.files[0]) {
+    const reader = new FileReader();
+    reader.onload = function(e) {
+      const dataUrl = e.target.result;
+      localStorage.setItem('ipure_logo', dataUrl);
+      applyLogoToAdmin();
+      showT('Logo updated! Live on site ✓');
+    }
+    reader.readAsDataURL(input.files[0]);
+  }
+}
+function resetLogo() {
+  localStorage.removeItem('ipure_logo');
+  applyLogoToAdmin();
+  showT('Logo reset to default ✓');
+}
+function applyLogoToAdmin() {
+  const customLogo = localStorage.getItem('ipure_logo');
+  const src = customLogo || 'logo.png';
+  document.querySelectorAll('img[alt="iPure"]').forEach(img => {
+      img.src = src;
+  });
+  const btn = document.getElementById('reset-logo-btn');
+  if (btn) btn.style.display = customLogo ? 'block' : 'none';
+}
+applyLogoToAdmin();
+window.addEventListener('storage', (e) => {
+    if (e.key === 'ipure_logo') applyLogoToAdmin();
+});
+
   </script>
 </body>
 
